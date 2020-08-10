@@ -13,7 +13,6 @@ var userData = { userid: "5bacc2e59bb8962504a6e142" };
 
 describe('REST API testing', function() {
     before(function() {
-
     });
 
     after(function() {
@@ -21,7 +20,6 @@ describe('REST API testing', function() {
     });
 
     describe('GET /api', function() {
-
         it('respond with status message', function(done) {
             requester.get('/api').end(function(err, res) {
                 chai.expect(res).to.have.status(200);
@@ -29,7 +27,6 @@ describe('REST API testing', function() {
                 done();
             });
         });
-
     });
 
     describe('GET /api/topEpisodes/1', function() {
@@ -51,5 +48,4 @@ describe('REST API testing', function() {
             });
         });
     });
-
 });
