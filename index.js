@@ -12,7 +12,7 @@ import expresslogger from 'express-logger';
 
 global._request = {};
 
-import { config, amqpconnection } from './config';
+import { config } from './config';
 import route from './app/route';
 import { errorHandler, ServerErrorHandler } from './app/helpers'
 

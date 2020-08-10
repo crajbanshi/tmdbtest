@@ -20,8 +20,8 @@ var saveTmdb = async () => {
                 timeout: 10000,
                 followRedirect: true,
                 maxRedirects: 10
-            }, function (error, response, body) {
-                // console.log(body);
+            }, async (error, response, body) =>{
+                console.log("TBDB body", body);
                 tmdbObj = new Tmdb({ ...body });
                 await tmdbObj.save();
 
@@ -33,7 +33,7 @@ var saveTmdb = async () => {
                         timeout: 10000,
                         followRedirect: true,
                         maxRedirects: 10
-                    }, function (error1, response1, body1) {
+                    }, async (error1, response1, body1)=> {
                         // console.log(body);
                         episodeObj = new Episode({ ...body1.episodes });
                         await episodeObj.save();
