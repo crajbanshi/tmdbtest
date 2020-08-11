@@ -1,19 +1,11 @@
 "use strict";
 
-import jwt from 'jsonwebtoken';
-// import * as axios  from 'axios';
+// import jwt from 'jsonwebtoken';
+import  axios  from 'axios';
+import  https  from 'https';
 
-import * as request from 'request';
-// import * as superagent  from 'superagent';
-
-
-import { config, redisClient } from '../../config';
+import { config } from '../config';
 import { Tmdbs, Episodes } from '../models';
-// import {} from '../helpers';
-
-var superagent = require('superagent');
-var axios = require('axios');
-const https = require('https');
 
 var api_url = process.env.API_URL;
 var APIKEY = process.env.API_KEY;
@@ -95,10 +87,12 @@ var topEpisodes = (req, res, next) => {
         })
     })
         .then(async (response1) => {
-            var body1 = response1.data;
+            var body1 = response1.data.episodes;
             // console.log("episodes body", body1.episodes);
 
-            res.send(body1.episodes);
+            body1.sort( function ( a, b ) { return b.vote_average - a.vote_average; } );
+
+            res.send(body1);
             res.end();           
 
         }).catch((error) => {

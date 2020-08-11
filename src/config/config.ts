@@ -13,7 +13,7 @@ if (detectMocha()) {
 
 const config = {
     port: process.env.PORT,
-    env: process.env.ENV,
+    env: process.env.ENV || 3200,
     thisUrl: process.env.SERVER_URL || 'http://' + os.hostname() + ':' + process.env.SERVER_PORT + '/api',
     uploadDir: 'upload/',
     imageExt: ['.jpg', '.gif', '.png'],
