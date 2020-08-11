@@ -16,8 +16,7 @@
         "prestart-dev": "npm run build",
         "serve": "nodemon --watch app --watch config --watch view --watch index.js  --exec \"npm run build && babel-node dist/index.js\"",
         "start": "nodemon --exec babel-node  index.js",
-        "test1": "mocha --require @babel/register \"test/**/*.js\" --timeout 30000 --exit",
-        "test": "mocha --require @babel/register --require babel-polyfill"
+        "test": "mocha --require @babel/register --require babel-polyfill --timeout 30000 --exit"
     },
     "repository": {
         "type": "git",
@@ -33,6 +32,7 @@
         "@hapi/joi": "^16.1.8",
         "amqp": "^0.2.7",
         "amqplib": "^0.5.6",
+        "axios": "^0.19.2",
         "bluebird": "^3.7.2",
         "body-parser": "^1.19.0",
         "colors": "^1.4.0",
@@ -54,7 +54,9 @@
         "mongoose-unique-validator": "^2.0.3",
         "npm-run-all": "^4.1.5",
         "redis": "^2.8.0",
+        "request": "^2.88.2",
         "socket.io": "^2.3.0",
+        "superagent": "^6.0.0",
         "swagger-ui-express": "^4.1.4"
     },
     "devDependencies": {

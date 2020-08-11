@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import Promise from 'bluebird';
-import httpStatus from 'http-status';
-import crypto from 'crypto';
-import uniqueValidator from 'mongoose-unique-validator';
+// import Promise from 'bluebird';
+// import httpStatus from 'http-status';
+// import crypto from 'crypto';
+// import uniqueValidator from 'mongoose-unique-validator';
 
-import APIError from '../helpers/APIError';
+// import APIError from '../helpers/APIError';
 
 
 /**
@@ -27,7 +27,6 @@ var episodeSchema = new Schema({
     "vote_count": { type: Number, default: null },
     "crew":{ type: Array, default: null },
     "guest_stars":{ type: Array, default: null }
-
 });
 
 

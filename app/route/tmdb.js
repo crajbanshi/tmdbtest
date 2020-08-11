@@ -7,9 +7,11 @@ const router = express.Router();
  */
 
 
-router.route('/topEpisodes/:id').post(tmdbCtrl.topEpisodes);
+router.route('/savetmdb').get(tmdbCtrl.saveTmdb);
 
-router.route('/analytics/popularSeries').post(tmdbCtrl.popularSeries);
+router.route('/topEpisodes/:id').get(tmdbCtrl.topEpisodes);
+
+router.route('/analytics/popularSeries').get(tmdbCtrl.popularSeries);
 
 
 export default router;

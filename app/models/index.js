@@ -1,7 +1,6 @@
-import Users from './user';
 
-import Tmdb from './tmdb';
+import Tmdbs from './tmdb';
 
-import Episode from './episode'
+import Episodes from './episode'
 
-export { Users, Tmdb, Episode }
+export { Tmdbs, Episodes }

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
-import Promise from 'bluebird';
-import httpStatus from 'http-status';
-import crypto from 'crypto';
-import uniqueValidator from 'mongoose-unique-validator';
+// import Promise from 'bluebird';
+// import httpStatus from 'http-status';
+// import crypto from 'crypto';
+// import uniqueValidator from 'mongoose-unique-validator';
 
-import APIError from '../helpers/APIError';
+// import APIError from '../helpers/APIError';
 
-const securityKey = process.env.SECRET_KEY;
+// const securityKey = process.env.SECRET_KEY;
 
 /**
  * User Schema
