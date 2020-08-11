@@ -86,19 +86,25 @@ var saveTmdb = async () => {
 
 var topEpisodes = (req, res, next) => {
     let seriesId = req.params.id;
+    let showid = req.query.showid;
 
-    Episodes.find({ "show_id": seriesId }).sort({ "vote_average": -1 }).limit(20).exec((err, shows) => {
-        if (err) {
-            throw err;
-        }
+    axios.get(api_url + "/3/tv/"+showid+"/season/" + seriesId + "?api_key=" + APIKEY + "&language=en-US", {
+        headers: { "lang": "en-US" },
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        })
+    })
+        .then(async (response1) => {
+            var body1 = response1.data;
+            // console.log("episodes body", body1.episodes);
 
-        var data = {
-            status: true,
-            episode: shows
-        }
-        res.send(data);
-        res.end();
-    });
+            res.send(body1.episodes);
+            res.end();           
+
+        }).catch((error) => {
+            console.log(error);
+        });
+
 }
 
 

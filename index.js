@@ -44,8 +44,8 @@ app.use(express.static(path.join(__dirname, 'view', 'static')));
 // App routes
 app.use('/api', route);
 
-app.use(errorHandler);
-app.use(ServerErrorHandler);
+// app.use(errorHandler);
+// app.use(ServerErrorHandler);
 
 httpapp.listen(port, function() {
     console.log(`listening on *:${port}`);

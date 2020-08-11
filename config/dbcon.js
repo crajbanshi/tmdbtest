@@ -25,6 +25,7 @@ db.on('error', function(err) {
 });
 
 db.once('open', function() {
+    console.log("DB Connection Successful!", config.db.mongodb.host)
     logger.info("DB Connection Successful!", config.db.mongodb.host);
 });
 
