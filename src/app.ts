@@ -34,3 +34,5 @@ app.listen(port, err => {
   }
   return console.log(`server is listening on ${port}`);
 });
+
+export default app;
