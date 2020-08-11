@@ -2,9 +2,9 @@
   "name": "tmdb",
   "version": "1.0.0",
   "description": "\"test application\"",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "tsc && node dist/src/app.js",
     "test": "mocha -r ts-node/register test/**/*.ts --exit"
     
   },

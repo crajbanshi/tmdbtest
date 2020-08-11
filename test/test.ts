@@ -35,7 +35,7 @@ describe('REST API testing', function() {
         it('respond with an array of topbEpisodes of the show', function(done) {
             requester.get('/api/topEpisodes/1?showid=10000').send(userData).end(function(err, res) {
                 chai.expect(res).to.have.status(200);
-                // chai.expect(res.body).to.be.an.object;
+                chai.expect(res.body).to.be.an('array');
                 done();
             });
         });
@@ -45,7 +45,8 @@ describe('REST API testing', function() {
         it('respond with an array of popular Series', function(done) {
             requester.get('/api/analytics/popularSeries').send(userData).end(function(err, res) {
                 chai.expect(res).to.have.status(200);
-                // chai.expect(res.body).to.be.an.object;
+                chai.expect(res.body.results).to.have.length(5);
+                chai.expect(res.body.results).to.be.an('array');
                 done();
             });
         });
