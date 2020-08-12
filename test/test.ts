@@ -38,7 +38,7 @@ describe('REST API testing', function () {
         });
     });
 
-    describe('GET https://api.themoviedb.org/3/tv/1400?api_key=a3427f340e27edb699a3e0647ed6819d&language=en-US', function () {
+    describe('GET ' + api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', function () {
         it('respond with status message', async (done) => {
              axios.get(api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', {
                 headers: { "lang": "en-US" },
