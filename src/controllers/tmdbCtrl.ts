@@ -10,7 +10,7 @@ import { Tmdbs, Episodes } from '../models';
 var api_url = process.env.API_URL;
 var APIKEY = process.env.API_KEY;
 
-var callApi = (showid) => {
+var callApi = (showid: number) => {
 
     return new Promise(async (resolve) => {
         axios.get(api_url + "/3/tv/" + showid + "?api_key=" + APIKEY + "&language=en-US", {
@@ -71,38 +71,41 @@ var saveTmdb = async () => {
         });
 }
 
-
-var topEpisodes = (req, res, next) => {
-    let seriesId = req.params.id;
-    let showid = req.query.showid;
-
-    axios.get(api_url + "/3/tv/" + showid + "/season/" + seriesId + "?api_key=" + APIKEY + "&language=en-US", {
-        headers: { "lang": "en-US" },
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false
-        })
-    })
-        .then(async (response1) => {
-            var body1 = response1.data.episodes;
-
-            body1.sort(function (a, b) { return b.vote_average - a.vote_average; });
-
-            res.send(body1.slice(0, 20));
-            res.end();
-
-        }).catch((error) => {
-            res.send({
-                "success": false,
-                "status_code": 34,
-                "status_message": "The resource you requested could not be found."
-            });
-            res.end();
+var episodeGetRequest = async (showid: number, seriesId: number) => {
+    let res = { data: { episodes: [] } };
+    try {
+        res = await axios.get(api_url + "/3/tv/" + showid + "/season/" + seriesId + "?api_key=" + APIKEY + "&language=en-US", {
+            headers: { "lang": "en-US" },
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
         });
+    } catch (err) {
+        return {
+            "success": false,
+            "status_code": 34,
+            "status_message": "The resource you requested could not be found."
+        };
+    }
+
+    var body1 = res.data.episodes;
+    body1.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
+    return body1.slice(0, 20);
 
 }
 
 
-var popularSeries = (req, res, next) => {
+var topEpisodes = async (req: any, res: any, next: any) => {
+    let seriesId = req.params.id;
+    let showid = req.query.showid;
+
+    let data = await episodeGetRequest(showid, seriesId);
+    res.send(data);
+    res.end();
+}
+
+
+var popularSeries = (req: any, res: any, next: any) => {
 
     axios.get(api_url + "/3/tv/top_rated?api_key=" + APIKEY + "&language=en-US", {
         headers: { "lang": "en-US" },
@@ -114,8 +117,7 @@ var popularSeries = (req, res, next) => {
             var body1 = response1.data;
 
             var results = body1.results;
-            results.sort(function (a, b) { return b.vote_average - a.vote_average; });
-
+            results.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
 
             res.send({
                 "total_results": body1.total_results,
@@ -137,4 +139,4 @@ var popularSeries = (req, res, next) => {
 
 // saveTmdb();
 
-export default { saveTmdb, topEpisodes, popularSeries };
+export default { saveTmdb, topEpisodes, popularSeries, episodeGetRequest };

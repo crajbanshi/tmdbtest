@@ -8,6 +8,11 @@
     "test": "mocha -r ts-node/register test/**/*.ts --exit"
     
   },
+  "exclude": [
+    "./test/",
+    "./node_modules/",
+    "./dist/"
+  ],
   "author": "Chanchal Rajbanshi",
   "license": "ISC",
   "devDependencies": {

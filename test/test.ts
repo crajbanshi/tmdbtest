@@ -1,54 +1,89 @@
 import assert from 'assert';
 import chai from 'chai';
-
 import chaiHttp from 'chai-http';
+import axios from 'axios';
+import https from 'https';
 
 import app from '../src/app';
+
+import { tmdbCtrl } from '../src/controllers'
+
+var api_url = process.env.API_URL;
+var APIKEY = process.env.API_KEY;
 
 let should = chai.should();
 chai.use(chaiHttp);
 
 
 var requester = chai.request(app).keepOpen();
-var userData = { userid: "5bacc2e59bb8962504a6e142" };
 
 
-describe('REST API testing', function() {
-    before(function() {
+describe('REST API testing', function () {
+    before(function () {
     });
 
-    after(function() {
+    after(function () {
         requester.close();
     });
 
-    describe('GET /api', function() {
-        it('respond with status message', function(done) {
-            requester.get('/api').end(function(err, res) {
-                chai.expect(res).to.have.status(200);
-                // chai.expect(res.body).to.have.key('message');
-                done();
-            });
+    describe('GET /api', function () {
+        it('respond with status message', function (done) {
+            requester.get('/api')
+                .end(function (err: any, res: any) {
+                    if (err) throw err;
+                    chai.expect(res).to.have.status(200);
+                    // chai.expect(res.body).to.have.key('message');
+                    done();
+                });
         });
     });
 
-    describe('GET /api/topEpisodes/1', function() {
-        it('respond with an array of topbEpisodes of the show', function(done) {
-            requester.get('/api/topEpisodes/1?showid=10000').send(userData).end(function(err, res) {
-                chai.expect(res).to.have.status(200);
-                chai.expect(res.body).to.be.an('array');
-                done();
-            });
+    describe('GET https://api.themoviedb.org/3/tv/1400?api_key=a3427f340e27edb699a3e0647ed6819d&language=en-US', function () {
+        it('respond with status message', async (done) => {
+             axios.get(api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', {
+                headers: { "lang": "en-US" },
+                httpsAgent: new https.Agent({
+                    rejectUnauthorized: false
+                })
+            }).then(res=>{
+                // console.log(res)               
+            }).catch(err=>{
+                // console.log(err)
+            })
+            done(); 
         });
     });
 
-    describe('GET /analytics/popularSeries', function() {
-        it('respond with an array of popular Series', function(done) {
-            requester.get('/api/analytics/popularSeries').send(userData).end(function(err, res) {
-                chai.expect(res).to.have.status(200);
-                chai.expect(res.body.results).to.have.length(5);
-                chai.expect(res.body.results).to.be.an('array');
-                done();
-            });
+    describe('Function test episodeGetRequest(1400, 1) ', async () => {
+        it('respond with an array of top Episodes of the show', async (done) => {
+            tmdbCtrl.episodeGetRequest(1400, 1);
+            done();
+        });
+    });
+
+
+    describe('GET /api/topEpisodes/1?showid=10000', function () {
+        it('respond with an array of top Episodes of the show', function (done) {
+            requester.get('/api/topEpisodes/1?showid=10000')
+                .end(function (err: any, res: any) {
+                    if (err) throw err;
+                    chai.expect(res).to.have.status(200);
+                    chai.expect(res.body).to.be.an('array');
+                    done();
+                });
+        });
+    });
+
+    describe('GET /analytics/popularSeries', function () {
+        it('respond with an array of popular Series', function (done) {
+            requester.get('/api/analytics/popularSeries')
+                .end(function (err: any, res: any) {
+                    if (err) throw err;
+                    chai.expect(res).to.have.status(200);
+                    chai.expect(res.body.results).to.have.length(5);
+                    chai.expect(res.body.results).to.be.an('array');
+                    done();
+                });
         });
     });
 });
