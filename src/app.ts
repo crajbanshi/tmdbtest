@@ -28,6 +28,9 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(expresslogger({ path: accessLogFile }));
 
 app.use('/api', route);
+app.use((req,res)=>{
+  res.status(404).send({message:"404 not found"})
+})
 app.listen(port, err => {
   if (err) {
     return console.error(err);

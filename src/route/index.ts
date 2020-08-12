@@ -10,4 +10,6 @@ router.route('/').all(function(req, res) {
 
 router.use(tmdb);
 
+//TODO 404 handle
+
 export default router;

@@ -38,7 +38,7 @@ describe('REST API testing', function () {
         });
     });
 
-    describe('GET ' + api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', function () {
+    describe('GET ' + api_url + '/3/tv/1400?api_key=<<APIKEY>>&language=en-US', function () {
         it('respond with status message', async (done) => {
              axios.get(api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', {
                 headers: { "lang": "en-US" },
@@ -74,6 +74,19 @@ describe('REST API testing', function () {
         });
     });
 
+    describe('GET /api/topEpisodes/1', function () {
+        it('respond with error message for showid missing', function (done) {
+            requester.get('/api/topEpisodes/1')
+                .end(function (err: any, res: any) {
+                    if (err) throw err;
+                    chai.expect(res).to.have.status(200);
+                    chai.expect(res.body).to.have.keys(["status", "message"])
+                    done();
+                });
+        });
+    });
+    
+
     describe('GET /analytics/popularSeries', function () {
         it('respond with an array of popular Series', function (done) {
             requester.get('/api/analytics/popularSeries')
@@ -86,4 +99,18 @@ describe('REST API testing', function () {
                 });
         });
     });
+
+    describe('GET /api/notfound', function () {
+        it('respond with error message 404', function (done) {
+            requester.get('/api/notfound')
+                .end(function (err: any, res: any) {
+                    if (err) throw err;
+                    console.log(res.body)
+                    chai.expect(res).to.have.status(404);
+                    done();
+                });
+        });
+    });
 });
+
+// TODO 
