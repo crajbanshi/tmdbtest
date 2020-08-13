@@ -110,7 +110,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
         // Log data payload
         let logData = {
             callurl: "popularSeries",
-            data: resp,
+            data: JSON.parse(resp),
             time: Date().toString()
         }
 
@@ -145,7 +145,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
                     "results": results.slice(0, 5)
                 };
                 // Storing cashe to redis       
-                await redisClient.set(`popularSeries`, resp, 'EX', 60 * 5);
+                await redisClient.set(`popularSeries`, JSON.stringify( resp ), 'EX', 60 * 5);
 
                 // Log data payload
                 let logData = {
@@ -165,6 +165,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
             })
             // default error handler
             .catch(async (error) => {
+                console.log(error)
                 let result = {
                     "success": false,
                     "status_code": 34,
