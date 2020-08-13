@@ -3,4 +3,6 @@ import Tmdbs from './tmdb';
 
 import Episodes from './episode'
 
-export { Tmdbs, Episodes }
+import Logs from './log'
+
+export { Tmdbs, Episodes, Logs }

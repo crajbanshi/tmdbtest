@@ -5,12 +5,12 @@
  * 
  */
 
-
+// import library
 import axios from 'axios';
 import https from 'https';
 
 import { config } from '../config';
-import { Tmdbs, Episodes } from '../models';
+import { Tmdbs, Episodes, Logs } from '../models';
 
 var api_url = process.env.API_URL;
 
@@ -20,14 +20,14 @@ const APIKEY = process.env.API_KEY;
 var callApi = (showid: number) => {
 
     return new Promise(async (resolve) => {
-        
+
         axios.get(api_url + "/3/tv/" + showid + "?api_key=" + APIKEY + "&language=en-US", {
             headers: { "lang": "en-US" },
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
             })
         })
-        // Handling response
+            // Handling response
             .then(async (response) => {
                 var body = response.data;
                 var tmdbObj = new Tmdbs({ ...body });
@@ -41,9 +41,9 @@ var callApi = (showid: number) => {
                             rejectUnauthorized: false
                         })
                     })
-                    // Handling season episodes response
+                        // Handling season episodes response
                         .then(async (resp) => {
-                            var data = resp.data;                           
+                            var data = resp.data;
 
                             data.episodes.forEach(async (episode) => {
                                 var episodeObj = new Episodes({ ...episode });
@@ -96,8 +96,10 @@ var saveTmdb = async () => {
 var episodeGetRequest = async (showid: number, seriesId: number) => {
     let res = { data: { episodes: [] } };
     try {
+        let url = `${api_url}/3/tv/${showid}/season/${seriesId}?api_key=${APIKEY}&language=en-US`;
+
         // calling themoviedb,org api to get episodes
-        res = await axios.get(api_url + "/3/tv/" + showid + "/season/" + seriesId + "?api_key=" + APIKEY + "&language=en-US", {
+        res = await axios.get(url, {
             headers: { "lang": "en-US" },
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
@@ -119,7 +121,7 @@ var episodeGetRequest = async (showid: number, seriesId: number) => {
 
     // sorting by vote_average
     episodes.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
-    
+
     // returning top 20 episodes if there are more than 20 episodes
     return episodes.slice(0, 20);
 
@@ -131,15 +133,29 @@ var topEpisodes = async (req: any, res: any, next: any) => {
     let showid = req.query.showid;
 
     // validating show id
-    if(!showid){
-        res.send({status:false,
-        message:"Show id is missing, add query string showid"});
+    if (!showid) {
+        res.send({
+            status: false,
+            message: "Show id is missing, add query string showid"
+        });
         res.end();
         return;
     }
 
     // getting episode details
     let data = await episodeGetRequest(showid, seriesId);
+
+    // Log data payload
+    let logData = {
+        callurl: "topEpisodes",
+        data: data,
+        time: Date().toString()
+    }
+
+    // Loging data to db
+    var log = new Logs({ ...logData });
+    await log.save();
+
     res.send(data);
     res.end();
 }
@@ -153,21 +169,32 @@ var topEpisodes = async (req: any, res: any, next: any) => {
  */
 var popularSeries = (req: any, res: any, next: any) => {
 
-     // calling themoviedb,org api to get top rated series
+    // calling themoviedb,org api to get top rated series
     axios.get(`${api_url}/3/tv/top_rated?api_key=${APIKEY}&language=en-US`, {
         headers: { "lang": "en-US" },
         httpsAgent: new https.Agent({
             rejectUnauthorized: false
         })
     })
-    // handeling response
+        // handeling response
         .then(async (response) => {
             var data = response.data;
 
             var results = data.results;
 
             // soring by vote_average decending order
-            results.sort(function ( a: any, b: any ) { return b.vote_average - a.vote_average; });
+            results.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
+
+            // Log data payload
+            let logData = {
+                callurl: "popularSeries",
+                data: results,
+                time: Date().toString()
+            }
+
+            // Loging data to db
+            var log = new Logs({ ...logData });
+            await log.save();
 
             // sending response
             res.send({
@@ -179,12 +206,26 @@ var popularSeries = (req: any, res: any, next: any) => {
 
         })
         // default error handler
-        .catch((error) => {
-            res.send({
+        .catch(async (error) => {
+            let result = {
                 "success": false,
                 "status_code": 34,
                 "status_message": "The resource you requested could not be found."
-            });
+            };
+
+            // Log data payload
+            let logData = {
+                callurl: "popularSeries",
+                data: result,
+                time: Date().toString()
+            }
+
+            // Loging data to db
+            var log = new Logs({ ...logData });
+            await log.save();
+
+            // sending response
+            res.send(result);
             res.end();
         });
 
