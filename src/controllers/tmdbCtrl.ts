@@ -190,6 +190,5 @@ var popularSeries = async (req: any, res: any, next: any) => {
     }
 }
 
-var episodeGetRequest = apiService.episodeGetRequest;
 
-export default { saveTmdb, topEpisodes, popularSeries, episodeGetRequest };
+export default { saveTmdb, topEpisodes, popularSeries };
