@@ -12,14 +12,14 @@ import https from 'https';
 import { redisClient } from '../config';
 import { Tmdbs, Episodes, Logs } from '../models';
 
-import { ApiService } from '../services';
+import { MovieService } from '../services';
 
 var api_url = process.env.API_URL;
 
 const APIKEY = process.env.API_KEY;
 
 
-var apiService = new ApiService();
+var apiService = new MovieService();
 
 /**
  * save data to DB
@@ -145,7 +145,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
                     "results": results.slice(0, 5)
                 };
                 // Storing cashe to redis       
-                // await redisClient.set(`popularSeries`, resp, 'EX', 60 * 5);
+                await redisClient.set(`popularSeries`, resp, 'EX', 60 * 5);
 
                 // Log data payload
                 let logData = {

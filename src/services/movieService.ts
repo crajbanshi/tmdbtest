@@ -15,7 +15,7 @@ var api_url = process.env.API_URL;
 
 const APIKEY = process.env.API_KEY;
 
-class ApiService {
+class MovieService {
 
     ApiService() { }
 
@@ -147,4 +147,4 @@ class ApiService {
 
 }
 
-export default ApiService;
+export default MovieService;

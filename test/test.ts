@@ -8,7 +8,7 @@ import app from '../src/app';
 
 import { tmdbCtrl } from '../src/controllers'
 
-import { ApiService } from '../src/services';
+import { MovieService } from '../src/services';
 
 var api_url = process.env.API_URL;
 var APIKEY = process.env.API_KEY;
@@ -64,7 +64,7 @@ describe('REST API testing', function () {
     describe('Function test episodeGetRequest(1400, 1) ', async () => {
         it('respond with an array of top Episodes of the show', async (done) => {
             // tmdbCtrl.episodeGetRequest(1400, 1);
-            var apiService = new ApiService();
+            var apiService = new MovieService();
             apiService.episodeGetRequest(1400, 1);
             done();
         });

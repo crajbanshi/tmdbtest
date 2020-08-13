@@ -1,3 +1,3 @@
-import ApiService from './service';
+import MovieService from './movieService';
 
-export { ApiService };
+export { MovieService };
