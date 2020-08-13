@@ -9,62 +9,17 @@
 import axios from 'axios';
 import https from 'https';
 
-import { config, redisClient } from '../config';
+import { redisClient } from '../config';
 import { Tmdbs, Episodes, Logs } from '../models';
+
+import { ApiService } from '../services';
 
 var api_url = process.env.API_URL;
 
 const APIKEY = process.env.API_KEY;
 
-// Calling api.themoviedb.org API to get Tv details
-var callApi = (showid: number) => {
 
-    return new Promise(async (resolve) => {
-
-        axios.get(api_url + "/3/tv/" + showid + "?api_key=" + APIKEY + "&language=en-US", {
-            headers: { "lang": "en-US" },
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false
-            })
-        })
-            // Handling response
-            .then(async (response) => {
-                var body = response.data;
-                var tmdbObj = new Tmdbs({ ...body });
-                await tmdbObj.save();
-
-                // geting episodes by season
-                body.seasons.forEach((season) => {
-                    axios.get(api_url + "/3/tv/" + showid + "/season/" + season.season_number + "?api_key=" + APIKEY + "&language=en-US", {
-                        headers: { "lang": "en-US" },
-                        httpsAgent: new https.Agent({
-                            rejectUnauthorized: false
-                        })
-                    })
-                        // Handling season episodes response
-                        .then(async (resp) => {
-                            var data = resp.data;
-
-                            data.episodes.forEach(async (episode) => {
-                                var episodeObj = new Episodes({ ...episode });
-                                await episodeObj.save();
-                            });
-
-                        })
-                        // handle error
-                        .catch((error) => {
-                            console.log(error);
-                        });
-
-                });
-                resolve(true);
-            })
-            // Handaling Http error
-            .catch((error) => {
-                console.log(error);
-            });
-    });
-}
+let apiService = new ApiService();
 
 /**
  * save data to DB
@@ -75,7 +30,7 @@ var saveTmdb = async () => {
     var i = 1, max = 110000;
 
     for (i = 1; i <= max; i++) {
-        promises.push(callApi(i));
+        promises.push(apiService.callApi(i));
     }
 
     Promise.all(promises)
@@ -142,13 +97,28 @@ var topEpisodes = async (req: any, res: any, next: any) => {
         return;
     }
     let data: any;
-    const value = await redisClient.get(`topEpisodes${showid}-${seriesId}`);
+    var value = null;
+
+    try {
+        value = await redisClient.get(`topEpisodes${showid}-${seriesId}`);
+    } catch (err) {
+        console.log(err);
+    }
     if (value) {
         data = value;
     } else {
         // getting episode details
-        data = await episodeGetRequest(showid, seriesId);
-        await redisClient.set(`topEpisodes${showid}-${seriesId}`, data);
+        // data = await episodeGetRequest(showid, seriesId);
+
+        
+        data = await apiService.episodeGetRequest(showid, seriesId);
+        try {
+            await redisClient.set(`topEpisodes${showid}-${seriesId}`, data, 'EX', 60 * 5);
+        } catch (err) {
+            console.log(err);
+        }
+
+
     }
     // Log data payload
     let logData = {
@@ -214,7 +184,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
                     "results": results.slice(0, 5)
                 };
                 // Storing cashe to redis       
-                await redisClient.set(`popularSeries`, resp);
+                // await redisClient.set(`popularSeries`, resp, 'EX', 60 * 5);
 
                 // Log data payload
                 let logData = {
