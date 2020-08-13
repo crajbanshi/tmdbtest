@@ -9,7 +9,7 @@
 import axios from 'axios';
 import https from 'https';
 
-import { config } from '../config';
+import { config, redisClient } from '../config';
 import { Tmdbs, Episodes, Logs } from '../models';
 
 var api_url = process.env.API_URL;
@@ -141,10 +141,15 @@ var topEpisodes = async (req: any, res: any, next: any) => {
         res.end();
         return;
     }
-
-    // getting episode details
-    let data = await episodeGetRequest(showid, seriesId);
-
+    let data: any;
+    const value = await redisClient.get(`topEpisodes${showid}-${seriesId}`);
+    if (value) {
+        data = value;
+    } else {
+        // getting episode details
+        data = await episodeGetRequest(showid, seriesId);
+        await redisClient.set(`topEpisodes${showid}-${seriesId}`, data);
+    }
     // Log data payload
     let logData = {
         callurl: "topEpisodes",
@@ -167,68 +172,91 @@ var topEpisodes = async (req: any, res: any, next: any) => {
  * @param res 
  * @param next 
  */
-var popularSeries = (req: any, res: any, next: any) => {
+var popularSeries = async (req: any, res: any, next: any) => {
+    const value = await redisClient.get(`popularSeries`);
+    if (value) {
+        let resp = value;
+        // Log data payload
+        let logData = {
+            callurl: "popularSeries",
+            data: resp,
+            time: Date().toString()
+        }
 
-    // calling themoviedb,org api to get top rated series
-    axios.get(`${api_url}/3/tv/top_rated?api_key=${APIKEY}&language=en-US`, {
-        headers: { "lang": "en-US" },
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false
+        // Loging data to db
+        var log = new Logs({ ...logData });
+        await log.save();
+
+        // sending response
+        res.send(resp);
+        res.end();
+
+    } else {
+        // calling themoviedb,org api to get top rated series
+        axios.get(`${api_url}/3/tv/top_rated?api_key=${APIKEY}&language=en-US`, {
+            headers: { "lang": "en-US" },
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
         })
-    })
-        // handeling response
-        .then(async (response) => {
-            var data = response.data;
+            // handeling response
+            .then(async (response) => {
+                var data = response.data;
 
-            var results = data.results;
+                var results = data.results;
 
-            // soring by vote_average decending order
-            results.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
+                // soring by vote_average decending order
+                results.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
 
-            // Log data payload
-            let logData = {
-                callurl: "popularSeries",
-                data: results,
-                time: Date().toString()
-            }
+                let resp = {
+                    "total_results": data.total_results,
+                    "showing": "top 5",
+                    "results": results.slice(0, 5)
+                };
+                // Storing cashe to redis       
+                await redisClient.set(`popularSeries`, resp);
 
-            // Loging data to db
-            var log = new Logs({ ...logData });
-            await log.save();
+                // Log data payload
+                let logData = {
+                    callurl: "popularSeries",
+                    data: resp,
+                    time: Date().toString()
+                }
 
-            // sending response
-            res.send({
-                "total_results": data.total_results,
-                "showing": "top 5",
-                "results": results.slice(0, 5)
+                // Loging data to db
+                var log = new Logs({ ...logData });
+                await log.save();
+
+                // sending response
+                res.send(resp);
+                res.end();
+
+            })
+            // default error handler
+            .catch(async (error) => {
+                let result = {
+                    "success": false,
+                    "status_code": 34,
+                    "status_message": "The resource you requested could not be found."
+                };
+
+                // Log data payload
+                let logData = {
+                    callurl: "popularSeries",
+                    data: result,
+                    time: Date().toString()
+                }
+
+                // Loging data to db
+                var log = new Logs({ ...logData });
+                await log.save();
+
+                // sending response
+                res.send(result);
+                res.end();
             });
-            res.end();
 
-        })
-        // default error handler
-        .catch(async (error) => {
-            let result = {
-                "success": false,
-                "status_code": 34,
-                "status_message": "The resource you requested could not be found."
-            };
-
-            // Log data payload
-            let logData = {
-                callurl: "popularSeries",
-                data: result,
-                time: Date().toString()
-            }
-
-            // Loging data to db
-            var log = new Logs({ ...logData });
-            await log.save();
-
-            // sending response
-            res.send(result);
-            res.end();
-        });
-
+    }
 }
 
 
