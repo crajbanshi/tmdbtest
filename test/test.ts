@@ -61,18 +61,18 @@ describe('REST API testing', function () {
     });
 
     // core function testing
-    describe('Function test episodeGetRequest(1400, 1) ', async () => {
-        it('respond with an array of top Episodes of the show', async (done) => {            
+    describe('Function test callApi(1400) ', async () => {
+        it('respond with an array of top 20 Episodes of the show', async (done) => {            
             var apiService = new MovieService();
-            apiService.episodeGetRequest(1400, 1);
+            apiService.callApi(1400);
             done();
         });
     });
 
 // positive test case
-    describe('GET /api/topEpisodes/1?showid=10000', function () {
+    describe('GET /api/topEpisodes/1400', function () {
         it('respond with an array of top Episodes of the show', function (done) {
-            requester.get('/api/topEpisodes/1?showid=10000')
+            requester.get('/api/topEpisodes/1400')
                 .end(function (err: any, res: any) {
                     if (err) throw err;
                     chai.expect(res).to.have.status(200);
@@ -82,19 +82,6 @@ describe('REST API testing', function () {
         });
     });
 
-    // Negative test case
-    describe('GET /api/topEpisodes/1', function () {
-        it('respond with error message for showid missing', function (done) {
-            requester.get('/api/topEpisodes/1')
-                .end(function (err: any, res: any) {
-                    if (err) throw err;
-                    chai.expect(res).to.have.status(200);
-                    chai.expect(res.body).to.have.keys(["status", "message"])
-                    done();
-                });
-        });
-    });
-    
 
     // Positive test case, 
     describe('GET /analytics/popularSeries', function () {

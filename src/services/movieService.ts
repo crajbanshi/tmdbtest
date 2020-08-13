@@ -22,9 +22,10 @@ class MovieService {
     // Calling api.themoviedb.org API to get Tv details
     callApi(showid: number) {
 
+        // return promise
         return new Promise(async (resolve, reject) => {
-
-            axios.get(api_url + "/3/tv/" + showid + "?api_key=" + APIKEY + "&language=en-US", {
+            // calling API
+            axios.get(`${api_url}/3/tv/${showid}?api_key=${APIKEY}&language=en-US`, {
                 headers: { "lang": "en-US" },
                 httpsAgent: new https.Agent({
                     rejectUnauthorized: false
@@ -33,12 +34,16 @@ class MovieService {
                 // Handling response
                 .then(async (response) => {
                     var body = response.data;
+                   
                     var tmdbObj = new Tmdbs({ ...body });
                     await tmdbObj.save();
 
+                    if(body.seasons.length==0){
+                        resolve(body);
+                    }else{
                     // geting episodes by season
                     body.seasons.forEach((season) => {
-                        axios.get(api_url + "/3/tv/" + showid + "/season/" + season.season_number + "?api_key=" + APIKEY + "&language=en-US", {
+                        axios.get(`${api_url}/3/tv/${showid}/season/${season.season_number}?api_key=${APIKEY}&language=en-US`, {
                             headers: { "lang": "en-US" },
                             httpsAgent: new https.Agent({
                                 rejectUnauthorized: false
@@ -53,14 +58,18 @@ class MovieService {
                                     await episodeObj.save();
                                 });
 
+                                data.episodes.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
+                                
+                                resolve(data.episodes.slice(0, 20));
+
                             })
                             // handle error
                             .catch((error) => {
                                 console.log(error);
                             });
-
-                    });
-                    resolve(body);
+                        
+                    }); }
+                
                 })
                 // Handaling Http error
                 .catch((error) => {

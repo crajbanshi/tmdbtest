@@ -60,11 +60,8 @@ var topEpisodes = async (req: any, res: any, next: any) => {
         data = JSON.parse(value);
     } else {
 
-
-
         try {
             // getting episode details 
-
             data = await apiService.callApi(seriesId);
 
             // store data to redis cache
@@ -84,8 +81,6 @@ var topEpisodes = async (req: any, res: any, next: any) => {
                 "status_message": "The resource you requested could not be found."
             };
         }
-
-
     }
     // Log data payload
     let logData = {
