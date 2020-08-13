@@ -43,8 +43,66 @@ var saveTmdb = async () => {
 }
 
 
-
 var topEpisodes = async (req: any, res: any, next: any) => {
+    // getting url parameter and query data 
+    let seriesId = req.params.id;
+
+
+    let data: any;
+    var value = null;
+    // try to fetch data from redis cache
+    try {
+        value = await redisClient.get(`topEpisodes-${seriesId}`);
+    } catch (err) {
+        console.log(err);
+    }
+    if (value) {
+        data = JSON.parse(value);
+    } else {
+
+
+
+        try {
+            // getting episode details 
+
+            data = await apiService.callApi(seriesId);
+
+            // store data to redis cache
+            if (data) {
+                await redisClient.set(`topEpisodes-${seriesId}`, JSON.stringify(data), 'EX', 60 * 5);
+            } else {
+                data = {
+                    "success": false,
+                    "status_code": 34,
+                    "status_message": "The resource you requested could not be found."
+                };
+            }
+        } catch (err) {
+            data = {
+                "success": false,
+                "status_code": 34,
+                "status_message": "The resource you requested could not be found."
+            };
+        }
+
+
+    }
+    // Log data payload
+    let logData = {
+        callurl: req.url,
+        data: data,
+        time: Date().toString()
+    }
+
+    // Loging data to db
+    var log = new Logs({ ...logData });
+    await log.save();
+
+    res.send(data);
+    res.end();
+}
+
+var topEpisodes1 = async (req: any, res: any, next: any) => {
     // getting url parameter and query data 
     let seriesId = req.params.id;
     let showid = req.query.showid;
@@ -83,7 +141,7 @@ var topEpisodes = async (req: any, res: any, next: any) => {
     }
     // Log data payload
     let logData = {
-        callurl: "topEpisodes",
+        callurl: req.url,
         data: data,
         time: Date().toString()
     }
@@ -145,7 +203,7 @@ var popularSeries = async (req: any, res: any, next: any) => {
                     "results": results.slice(0, 5)
                 };
                 // Storing cashe to redis       
-                await redisClient.set(`popularSeries`, JSON.stringify( resp ), 'EX', 60 * 5);
+                await redisClient.set(`popularSeries`, JSON.stringify(resp), 'EX', 60 * 5);
 
                 // Log data payload
                 let logData = {

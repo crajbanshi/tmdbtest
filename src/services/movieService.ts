@@ -22,7 +22,7 @@ class MovieService {
     // Calling api.themoviedb.org API to get Tv details
     callApi(showid: number) {
 
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
 
             axios.get(api_url + "/3/tv/" + showid + "?api_key=" + APIKEY + "&language=en-US", {
                 headers: { "lang": "en-US" },
@@ -60,11 +60,11 @@ class MovieService {
                             });
 
                     });
-                    resolve(true);
+                    resolve(body);
                 })
                 // Handaling Http error
                 .catch((error) => {
-                    console.log(error);
+                    reject(error);
                 });
         });
     }
