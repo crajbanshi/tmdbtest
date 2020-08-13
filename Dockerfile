@@ -14,5 +14,5 @@ RUN npm run build
 FROM base AS release 
 COPY --from=dependencies /app/prod_node_modules ./node_modules 
 COPY --from=test /app/dist ./dist 
-EXPOSE 3000 
+EXPOSE 3200 
 CMD [ "npm", "start" ]
