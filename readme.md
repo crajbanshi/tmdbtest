@@ -13,6 +13,6 @@ http://localhost:3200/api/analytics/popularSeries
 
 To test this code in docker need to run this command
 
-docker run -p 3200:3200 -e github='https://github.com/crajbanshi/tmdbtest.git' -it debian
+docker run -p 3200:3200 -e github='https://github.com/crajbanshi/tmdbtest.git' -it alpine
 
 This command will deploy code from github using port number 3200

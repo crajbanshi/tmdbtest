@@ -68,7 +68,6 @@ temp
 TODO.txt
 public/uploads
 pm2.json
-*.sh
 config/*.json
 log/*
 dist
