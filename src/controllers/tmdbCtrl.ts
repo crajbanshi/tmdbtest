@@ -10,9 +10,9 @@ import axios from 'axios';
 import https from 'https';
 
 import { redisClient } from '../config';
-import { Tmdbs, Episodes, Logs } from '../models';
+import { Tvseries, Episodes, Logs, ShowCounter } from '../models';
 
-import { MovieService } from '../services';
+import { MovieService, counter } from '../services';
 
 var api_url = process.env.API_URL;
 
@@ -69,14 +69,14 @@ var topEpisodes = async (req: any, res: any, next: any) => {
                 await redisClient.set(`topEpisodes-${seriesId}`, JSON.stringify(data), 'EX', 60 * 5);
             } else {
                 data = {
-                    "success": false,
+                    "status": false,
                     "status_code": 34,
                     "status_message": "The resource you requested could not be found."
                 };
             }
         } catch (err) {
             data = {
-                "success": false,
+                "status": false,
                 "status_code": 34,
                 "status_message": "The resource you requested could not be found."
             };
@@ -91,7 +91,10 @@ var topEpisodes = async (req: any, res: any, next: any) => {
 
     // Loging data to db
     var log = new Logs({ ...logData });
-    await log.save();
+    await log.save();  
+    
+     // update counter
+     counter(seriesId);
 
     res.send(data);
     res.end();
@@ -156,6 +159,16 @@ var topEpisodes1 = async (req: any, res: any, next: any) => {
  * @param res 
  * @param next 
  */
+var popularSeries1 = async (req: any, res: any, next: any) => {
+    const foundResult = await ShowCounter.find({}).sort({ counter: 'desc' }).limit(5);
+    if (foundResult) {
+        res.send(foundResult)
+    } else {
+        res.send({ message: "No records found" });
+    }
+}
+
+
 var popularSeries = async (req: any, res: any, next: any) => {
     const value = await redisClient.get(`popularSeries`);
     if (value) {
@@ -245,4 +258,4 @@ var popularSeries = async (req: any, res: any, next: any) => {
 }
 
 
-export default { saveTmdb, topEpisodes, popularSeries };
+export default { saveTmdb, topEpisodes, popularSeries, popularSeries1 };

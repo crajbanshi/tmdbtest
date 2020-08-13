@@ -1,8 +1,7 @@
 
-import Tmdbs from './tmdb';
+import Tvseries from './tvseries';
+import Episodes from './episode';
+import Logs from './log';
+import ShowCounter from './showcounter';
 
-import Episodes from './episode'
-
-import Logs from './log'
-
-export { Tmdbs, Episodes, Logs }
+export { Tvseries, Episodes, Logs, ShowCounter }

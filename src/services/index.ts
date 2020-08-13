@@ -1,3 +1,5 @@
 import MovieService from './movieService';
 
-export { MovieService };
+import {counter} from './counter';
+
+export { MovieService , counter};

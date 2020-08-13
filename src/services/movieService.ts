@@ -7,9 +7,8 @@
 import axios from 'axios';
 import https from 'https';
 
-import { Tmdbs, Episodes, Logs } from '../models';
-
-
+import { Tvseries, Episodes, Logs } from '../models';
+import { counter } from '../services';
 
 var api_url = process.env.API_URL;
 
@@ -35,8 +34,9 @@ class MovieService {
                 .then(async (response) => {
                     var body = response.data;
                    
-                    var tmdbObj = new Tmdbs({ ...body });
+                    var tmdbObj = new Tvseries({ ...body });
                     await tmdbObj.save();
+
 
                     if(body.seasons.length==0){
                         resolve(body);

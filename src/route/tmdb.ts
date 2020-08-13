@@ -11,7 +11,7 @@ router.route('/savetmdb').get(tmdbCtrl.saveTmdb);
 
 router.route('/topEpisodes/:id').get(tmdbCtrl.topEpisodes);
 
-router.route('/analytics/popularSeries').get(tmdbCtrl.popularSeries);
+router.route('/analytics/popularSeries').get(tmdbCtrl.popularSeries1);
 
 
 export default router;

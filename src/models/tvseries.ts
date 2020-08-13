@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 const { Schema } = mongoose;
 
-var tmdbSchema = new Schema({
+var tvSeriesSchema = new Schema({
     "backdrop_path": { type: String, default: null },
     "created_by": { type: Array, default: null },
     "episode_run_time": { type: Array, default: null },
@@ -38,4 +38,4 @@ var tmdbSchema = new Schema({
 });
 
 
-export default mongoose.model('tmdb', tmdbSchema);
+export default mongoose.model('tvseries', tvSeriesSchema);
