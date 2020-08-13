@@ -19,7 +19,7 @@ var api_url = process.env.API_URL;
 const APIKEY = process.env.API_KEY;
 
 
-let apiService = new ApiService();
+var apiService = new ApiService();
 
 /**
  * save data to DB
@@ -42,48 +42,10 @@ var saveTmdb = async () => {
         });
 }
 
-/**
- * sorting by vote_average, returning top 20 episodes if there are more than 20 episodes
- * 
- * @param showid 
- * @param seriesId 
- */
-var episodeGetRequest = async (showid: number, seriesId: number) => {
-    let res = { data: { episodes: [] } };
-    try {
-        let url = `${api_url}/3/tv/${showid}/season/${seriesId}?api_key=${APIKEY}&language=en-US`;
-
-        // calling themoviedb,org api to get episodes
-        res = await axios.get(url, {
-            headers: { "lang": "en-US" },
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false
-            })
-        });
-    }
-    // default error handler
-    catch (err) {
-        // Return if error 
-        return {
-            "success": false,
-            "status_code": 34,
-            "status_message": "The resource you requested could not be found."
-        };
-    }
-
-
-    var episodes = res.data.episodes;
-
-    // sorting by vote_average
-    episodes.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
-
-    // returning top 20 episodes if there are more than 20 episodes
-    return episodes.slice(0, 20);
-
-}
 
 
 var topEpisodes = async (req: any, res: any, next: any) => {
+    // getting url parameter and query data 
     let seriesId = req.params.id;
     let showid = req.query.showid;
 
@@ -98,7 +60,7 @@ var topEpisodes = async (req: any, res: any, next: any) => {
     }
     let data: any;
     var value = null;
-
+    // try to fetch data from redis cache
     try {
         value = await redisClient.get(`topEpisodes${showid}-${seriesId}`);
     } catch (err) {
@@ -107,11 +69,10 @@ var topEpisodes = async (req: any, res: any, next: any) => {
     if (value) {
         data = value;
     } else {
-        // getting episode details
-        // data = await episodeGetRequest(showid, seriesId);
-
-        
+        // getting episode details        
         data = await apiService.episodeGetRequest(showid, seriesId);
+
+        // store data to redis cache
         try {
             await redisClient.set(`topEpisodes${showid}-${seriesId}`, data, 'EX', 60 * 5);
         } catch (err) {
@@ -229,5 +190,6 @@ var popularSeries = async (req: any, res: any, next: any) => {
     }
 }
 
+var episodeGetRequest = apiService.episodeGetRequest;
 
 export default { saveTmdb, topEpisodes, popularSeries, episodeGetRequest };
