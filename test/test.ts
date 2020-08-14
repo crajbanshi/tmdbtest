@@ -46,12 +46,12 @@ describe('REST API testing', function () {
     // themoviedb.org API test
     describe('GET ' + api_url + '/3/tv/1400?api_key=<<APIKEY>>&language=en-US', function () {
         it('respond with status message', async (done) => {
-           let res =  axios.get(api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', {
+           let res = await  axios.get(api_url + '/3/tv/1400?api_key=' + APIKEY + '&language=en-US', {
                 headers: { "lang": "en-US" },
                 httpsAgent: new https.Agent({
                     rejectUnauthorized: false
                 })
-            })
+            });            
             chai.expect(res).to.have.status(200);
             done(); 
         });
@@ -62,7 +62,7 @@ describe('REST API testing', function () {
         it('respond with an array of top 20 Episodes of the show', async (done) => {            
             var apiService = new MovieService();
             let res =  await apiService.callApi(1400);
-            chai.expect(res).to.be.an('array');
+            chai.expect(res).to.be.an('object');
             done();
         });
     });
