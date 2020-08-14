@@ -74,7 +74,7 @@ describe('REST API testing', function () {
                 .end(function (err: any, res: any) {
                     if (err) throw err;
                     chai.expect(res).to.have.status(200);
-                    chai.expect(res.body).to.be.an('array');
+                    chai.expect(res.body).to.be.an('object');
                     done();
                 });
         });
