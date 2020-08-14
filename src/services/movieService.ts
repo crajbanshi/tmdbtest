@@ -8,7 +8,7 @@ import axios from 'axios';
 import https from 'https';
 
 import { Tvseries, Episodes, Logs } from '../models';
-import { counter } from '../services';
+import { counter } from '../helper';
 
 var api_url = process.env.API_URL;
 
@@ -32,17 +32,17 @@ class MovieService {
             })
                 // Handling response
                 .then(async (response) => {
-                    var body = response.data;
+                    var series = response.data;
                    
-                    var tmdbObj = new Tvseries({ ...body });
+                    var tmdbObj = new Tvseries({ ...series });
                     await tmdbObj.save();
 
 
-                    if(body.seasons.length==0){
-                        resolve(body);
+                    if(series.seasons.length==0){
+                        resolve(series);
                     }else{
                     // geting episodes by season
-                    body.seasons.forEach((season) => {
+                    series.seasons.forEach((season) => {
                         axios.get(`${api_url}/3/tv/${showid}/season/${season.season_number}?api_key=${APIKEY}&language=en-US`, {
                             headers: { "lang": "en-US" },
                             httpsAgent: new https.Agent({
@@ -60,7 +60,9 @@ class MovieService {
 
                                 data.episodes.sort(function (a: any, b: any) { return b.vote_average - a.vote_average; });
                                 
-                                resolve(data.episodes.slice(0, 20));
+                                resolve({series: series,
+                                   episode: data.episodes.slice(0, 20)
+                                });
 
                             })
                             // handle error

@@ -1,3 +1,4 @@
 import tmdbCtrl from './tmdbCtrl';
+import seriesCtrl from './seriesCtrl';
 
-export {  tmdbCtrl };
+export {  tmdbCtrl, seriesCtrl };

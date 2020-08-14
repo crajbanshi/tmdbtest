@@ -1,17 +1,14 @@
 import express from 'express';
-import { tmdbCtrl } from './../controllers';
+import { tmdbCtrl, seriesCtrl } from './../controllers';
 
 const router = express.Router();
 /**
- *configurator Routes
+ *  Routes for topEposodes
  */
 
 
-router.route('/savetmdb').get(tmdbCtrl.saveTmdb);
-
 router.route('/topEpisodes/:id').get(tmdbCtrl.topEpisodes);
 
-router.route('/analytics/popularSeries').get(tmdbCtrl.popularSeries1);
-
+router.route('/analytics/popularSeries').get(seriesCtrl.popularSeries);
 
 export default router;

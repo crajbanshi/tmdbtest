@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 
 /**
- * Log Schema
+ * Model to store audit log in mongoDB
  */
 mongoose.Promise = global.Promise;
 const { Schema } = mongoose;

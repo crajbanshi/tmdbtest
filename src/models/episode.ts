@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 
 /**
- * User Schema
+ *  Model for episode data
  */
 mongoose.Promise = global.Promise;
 const { Schema } = mongoose;

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 /**
- * TMDB Schema
+ * Model for tv series data
  */
 mongoose.Promise = global.Promise;
 const { Schema } = mongoose;
